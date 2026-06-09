@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psicologia na relação campo-cidade</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background-color: #121613; color: #e0e0e0; }
+        header { background-color: #1b5e20; color: white; text-align: center; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        main { padding: 20px; max-width: 700px; margin: 30px auto; }
+        
+        /* Ambiente do Jogo */
+        .game-container { background: #1e2621; padding: 30px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); border-top: 8px solid #ff1744; }
+        .stats { display: flex; justify-content: space-between; margin-bottom: 25px; background: #2c3630; padding: 15px; border-radius: 6px; font-weight: bold; }
+        .stat-bar { color: #81c784; }
+        
+        /* Caixa do Temporizador */
+        .timer-container { text-align: center; margin-bottom: 20px; font-size: 1.3rem; font-weight: bold; color: #ff5252; }
+        .timer-bar { height: 8px; background-color: #ff5252; width: 100%; transition: width 1s linear; border-radius: 4px; margin-top: 5px; }
+
+        /* Alertas de Impacto */
+        .impact-warning { background-color: #3e1b1b; border-left: 5px solid #ff1744; color: #ff8a80; padding: 12px; margin-bottom: 20px; font-size: 0.95rem; font-style: italic; animation: pulse 2s infinite; }
+        
+        #scenario-text { font-size: 1.15rem; line-height: 1.6; margin-bottom: 25px; min-height: 80px; color: #ffffff; }
+        
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .btn-option { background-color: #2c3630; border: 2px solid #4caf50; color: #fff; padding: 14px 20px; font-size: 1rem; border-radius: 8px; cursor: pointer; text-align: left; transition: all 0.2s ease; }
+        .btn-option:hover { background-color: #38463d; border-color: #ff1744; transform: translateY(-2px); }
+        
+        .feedback { display: none; margin-top: 20px; padding: 15px; border-radius: 8px; font-weight: bold; text-align: center; font-size: 1.1rem; }
+        .alert-active { background-color: #b71c1c; color: white; border: 1px solid #ff5252; }
+        
+        footer { text-align: center; padding: 20px; background: #0a0d0b; color: #777; font-size: 0.9rem; margin-top: 50px; }
+
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; border-left-color: #ff5252; }
+            100% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Psicologia na relação campo-cidade</h1>
+        <p>Decisões Críticas e Conseqüências Reais</p>
+    </header>
+
+    <main>
+        <div class="game-container">
+            <!-- Temporizador Visual -->
+            <div class="timer-container">
+                TEMPO RESTANTE: <span id="time-left">15</span>s
+                <div class="timer-bar" id="timer-bar"></div>
+            </div>
+
+            <!-- Barras de Status -->
+            <div class="stats">
+                <span class="stat-bar">Saúde Mental (Campo): <span id="campo-score">50</span>%</span>
+                <span class="stat-bar">Estabilidade (Cidade): <span id="cidade-score">50</span>%</span>
+            </div>
+
+            <!-- Frase de Impacto Psicológico (Muda por fase) -->
+            <div id="dynamic-warning" class="impact-warning"></div>
+
+            <!-- Conteúdo da Fase -->
+            <div id="game-box">
+                <div id="scenario-text">Preparando cenário de crise psicológica...</div>
+                <div class="options-list" id="options-container"></div>
+            </div>
+            
+            <div id="feedback-box" class="feedback"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Desenvolvido para o Projeto Agrinho - O fator humano na conexão social</p>
+    </footer>
+
+    <script>
+        const scenarios = [
+            {
+                warning: "⚠️ ALERTA: O isolamento social e o preconceito geográfico são gatilhos invisíveis para crises severas de ansiedade.",
+                text: "Fase 1: Um jovem do campo muda-se para a cidade grande para estudar. Ele sofre piadas por seu sotaque, desenvolve fobia social e pensa em desistir de tudo. Como agir?",
+                options: [
+                    {
+                        text: "Ignorar o preconceito e sugerir que ele mude seu jeito de falar para se misturar e sobreviver na cultura urbana.",
+                        impactCampo: -20, impactCidade: +5,
+                        feedback: "⚠️ IMPACTO: Crise de identidade severa. O jovem sente que sua história foi apagada para agradar a cidade."
+                    },
+                    {
+                        text: "Intervir na universidade com uma dinâmica de Psicologia Social, validando os saberes rurais e expondo o preconceito urbano.",
+                        impactCampo: +20, impactCidade: +15,
+                        feedback: "✨ SUCESSO: A empatia quebrou barreiras. O estudante tornou-se um líder e a cidade aprendeu a respeitar o campo."
+                    }
+                ]
+            },
+            {
+                warning: "⚠️ ALERTA: O estresse no trabalho agrícola (Burnout) cresce silenciosamente quando as exigências da cidade são irreais.",
+                text: "Fase 2: Supermercados urbanos rejeitam toneladas de alimentos saudáveis apenas porque são visualmente imperfeitos. Os agricultores estão endividados e sob extrema pressão psicológica. Qual a sua postura?",
+                options: [
+                    {
+                        text: "Lançar uma campanha de conscientização urbana focando no valor nutricional, reduzindo a culpa do produtor e o desperdício.",
+                        impactCampo: +25, impactCidade: +20,
+                        feedback: "✨ SUCESSO: Alívio financeiro e mental no campo. Mudança de comportamento e consumo consciente na cidade."
+                    },
+                    {
+                        text: "Exigir que as cooperativas do campo comprem maquinários caros de seleção para atender o padrão estético imposto.",
+                        impactCampo: -30, impactCidade: +5,
+                        feedback: "⚠️ CRÍTICO: Duas famílias rurais faliram devido às dívidas. Casos de depressão dispararam na comunidade."
+                    }
+                ]
+            },
+            {
+                warning: "⚠️ ALERTA: A desconexão com a natureza adoece a mente. Ambientes puramente urbanos aumentam os índices de estresse crônico.",
+                text: "Fase 3: Um projeto quer levar adolescentes estressados da cidade para trabalhar a saúde mental no campo. Mídias sensacionalistas espalham medo dizendo que o campo é perigoso e atrasado. Como salvar o projeto?",
+                options: [
+                    {
+                        text: "Recuar e cancelar o projeto, aceitando que a barreira cultural e o medo urbano são instransponíveis no momento.",
+                        impactCampo: -15, impactCidade: -25,
+                        feedback: "⚠️ FRACASSO: O preconceito venceu. Jovens urbanos continuam dependentes de telas e isolados em crises de estresse."
+                    },
+                    {
+                        text: "Abrir o diálogo usando dados de Ecopsicologia, provando cientificamente como o contato com a terra cura a mente.",
+                        impactCampo: +20, impactCidade: +30,
+                        feedback: "✨ SUCESSO: Quebra histórica de preconceitos. O campo foi reconhecido como um polo de cura e equilíbrio mental."
+                    }
+                ]
+            }
+        ];
+
+        let currentScenario = 0;
+        let campoScore = 50;
+        let cidadeScore = 50;
+        let timeLeft = 15;
+        let timerInterval;
+
+        const scenarioTextEl = document.getElementById('scenario-text');
+        const optionsContainerEl = document.getElementById('options-container');
+        const campoScoreEl = document.getElementById('campo-score');
+        const cidadeScoreEl = document.getElementById('cidade-score');
+        const feedbackBoxEl = document.getElementById('feedback-box');
+        const warningEl = document.getElementById('dynamic-warning');
+        const timeLeftEl = document.getElementById('time-left');
+        const timerBarEl = document.getElementById('timer-bar');
+
+        function updateStats() {
+            campoScoreEl.textContent = campoScore;
+            cidadeScoreEl.textContent = cidadeScore;
+        }
+
+        function startTimer() {
+            timeLeft = 15;
+            timeLeftEl.textContent = timeLeft;
+            timerBarEl.style.width = "100%";
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timeLeftEl.textContent = timeLeft;
+                timerBarEl.style.width = `${(timeLeft / 15) * 100}%`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleTimeout() {
+            // Penalidade por não responder a tempo
+            campoScore -= 20;
+            cidadeScore -= 20;
+            campoScore = Math.max(0, campoScore);
+            cidadeScore = Math.max(0, cidadeScore);
+            updateStats();
+
+            feedbackBoxEl.className = "feedback alert-active";
+            feedbackBoxEl.textContent = "⏱️ O TEMPO ACABOU! Sua omissão psicológica causou danos graves para ambas as comunidades.";
+            feedbackBoxEl.style.display = 'block';
+            optionsContainerEl.innerHTML = '';
+
+            setTimeout(() => {
+                currentScenario++;
+                loadScenario();
+            }, 4000);
+        }
+
+        function loadScenario() {
+            feedbackBoxEl.style.display = 'none';
+            
